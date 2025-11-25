@@ -1,0 +1,26 @@
+name: Run Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: 'Base64-encoded script to execute on the runner'
+        required: true
+      worker_id:
+        description: 'Worker identifier (available as $WORKER_ID in the script)'
+        required: false
+        default: '0'
+
+jobs:
+  execute:
+    name: Worker ${{ inputs.worker_id }}
+    runs-on: ubuntu-latest
+    env:
+      WORKER_ID: ${{ inputs.worker_id }}
+
+    steps:
+      - name: Run
+        run: |
+          echo "${{ inputs.script }}" | base64 -d > /tmp/run.sh
+          chmod +x /tmp/run.sh
+          exec /tmp/run.sh
